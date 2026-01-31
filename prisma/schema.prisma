@@ -1,0 +1,196 @@
+// Prisma schema for MongoDB
+// This schema defines all models based on the FastAPI backend
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("MONGO_URL")
+}
+
+model User {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  visibleId  String   @unique @map("id")
+  email      String   @unique
+  password   String
+  name       String
+  role       String   @default("viewer") // admin, operator, viewer
+  created_at DateTime @default(now())
+
+  @@map("users")
+}
+
+model Vehicle {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  visibleId    String   @unique @map("id")
+  vehicle_id   String   @unique
+  name         String
+  type         String   @default("truck")
+  latitude     Float    @default(40.7128)
+  longitude    Float    @default(-74.0060)
+  current_temp Float    @default(-18.0)
+  min_temp     Float    @default(-25.0)
+  max_temp     Float    @default(-15.0)
+  status       String   @default("active")
+  last_update  DateTime @default(now())
+  created_at   DateTime @default(now())
+
+  @@map("vehicles")
+}
+
+model SensorReading {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  visibleId   String   @unique @map("id")
+  vehicle_id  String
+  temperature Float
+  humidity    Float
+  latitude    Float
+  longitude   Float
+  timestamp   DateTime @default(now())
+
+  @@map("sensor_readings")
+}
+
+model Alert {
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  visibleId    String    @unique @map("id")
+  vehicle_id   String
+  vehicle_name String
+  alert_type   String
+  severity     String
+  message      String
+  temperature  Float?
+  is_resolved  Boolean   @default(false)
+  resolved_at  DateTime?
+  created_at   DateTime  @default(now())
+
+  @@map("alerts")
+}
+
+model AlertRule {
+  id                    String   @id @default(auto()) @map("_id") @db.ObjectId
+  visibleId             String   @unique @map("id")
+  name                  String
+  vehicle_id            String?
+  temp_threshold_min    Float    @default(-25.0)
+  temp_threshold_max    Float    @default(-15.0)
+  duration_minutes      Int      @default(5)
+  offline_alert_minutes Int      @default(10)
+  severity              String   @default("warning")
+  is_active             Boolean  @default(true)
+  created_at            DateTime @default(now())
+
+  @@map("alert_rules")
+}
+
+model Trip {
+  id                 String    @id @default(auto()) @map("_id") @db.ObjectId
+  visibleId          String    @unique @map("id")
+  trip_code          String    @unique
+  vehicle_id         String
+  vehicle_name       String
+  origin             String
+  destination        String
+  planned_start      DateTime
+  planned_end        DateTime
+  actual_start       DateTime?
+  actual_end         DateTime?
+  cargo_type         String    @default("frozen_goods")
+  status             String    @default("planned") // planned, active, completed, failed
+  is_compliant       Boolean   @default(true)
+  violation_count    Int       @default(0)
+  min_temp_recorded  Float?
+  max_temp_recorded  Float?
+  avg_temp_recorded  Float?
+  notes              String?
+  created_at         DateTime  @default(now())
+  created_by         String
+
+  @@map("trips")
+}
+
+model TripReading {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  visibleId   String   @unique @map("id")
+  trip_id     String
+  vehicle_id  String
+  temperature Float
+  humidity    Float
+  latitude    Float
+  longitude   Float
+  timestamp   DateTime @default(now())
+
+  @@map("trip_readings")
+}
+
+model TripAlert {
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  visibleId    String    @unique @map("id")
+  trip_id      String
+  vehicle_id   String
+  vehicle_name String
+  alert_type   String
+  severity     String
+  message      String
+  temperature  Float?
+  is_resolved  Boolean   @default(false)
+  resolved_at  DateTime?
+  created_at   DateTime  @default(now())
+
+  @@map("trip_alerts")
+}
+
+model ComplianceStandard {
+  id                            String   @id @default(auto()) @map("_id") @db.ObjectId
+  visibleId                     String   @unique @map("id")
+  name                          String
+  description                   String
+  min_temp                      Float    @default(-25.0)
+  max_temp                      Float    @default(-15.0)
+  max_violation_duration_minutes Int     @default(30)
+  max_violations_allowed        Int      @default(0)
+  max_offline_minutes           Int      @default(60)
+  is_active                     Boolean  @default(true)
+  created_at                    DateTime @default(now())
+
+  @@map("compliance_standards")
+}
+
+model ComplianceResult {
+  id                 String   @id @default(auto()) @map("_id") @db.ObjectId
+  visibleId          String   @unique @map("id")
+  trip_id            String
+  trip_code          String
+  vehicle_name       String
+  origin             String
+  destination        String
+  standard_id        String
+  standard_name      String
+  status             String   // passed, failed
+  score              Float
+  total_readings     Int
+  compliant_readings Int
+  violation_count    Int
+  violations         Json     // Array of ViolationDetail
+  evaluated_at       DateTime @default(now())
+  evaluated_by       String
+
+  @@map("compliance_results")
+}
+
+model Report {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  visibleId   String   @unique @map("id")
+  name        String
+  vehicle_ids String[] // Array of vehicle IDs
+  start_date  String
+  end_date    String
+  report_type String   @default("temperature")
+  status      String   @default("completed")
+  created_at  DateTime @default(now())
+  created_by  String
+
+  @@map("reports")
+}
