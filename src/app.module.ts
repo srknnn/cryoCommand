@@ -12,6 +12,7 @@ import { TripsModule } from './trips/trips.module';
 import { ComplianceModule } from './compliance/compliance.module';
 import { ReportsModule } from './reports/reports.module';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { SeedModule } from './seed/seed.module';
 
 @Module({
   imports: [
@@ -39,6 +40,9 @@ import { DashboardModule } from './dashboard/dashboard.module';
     ComplianceModule,
     ReportsModule,
     DashboardModule,
+
+    // Internal modules (dev/test only - protected by EnvironmentGuard)
+    SeedModule,
   ],
   controllers: [],
   providers: [],
