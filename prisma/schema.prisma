@@ -194,3 +194,64 @@ model Report {
 
   @@map("reports")
 }
+
+model VehicleRiskSnapshot {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  visibleId     String   @unique @map("id")
+  vehicle_id    String
+  score         Float
+  level         String   // LOW, MEDIUM, HIGH
+  reasons       String[]
+  calculated_at DateTime @default(now())
+
+  @@map("vehicle_risk_snapshots")
+}
+
+model TripRiskSnapshot {
+  id                     String   @id @default(auto()) @map("_id") @db.ObjectId
+  visibleId              String   @unique @map("id")
+  trip_id                String
+  score                  Float
+  level                  String   // LOW, MEDIUM, HIGH
+  predicted_eta          DateTime
+  expected_delay_minutes Int      @default(0)
+  calculated_at          DateTime @default(now())
+
+  @@map("trip_risk_snapshots")
+}
+
+model AssistantConversation {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  visibleId  String   @unique @map("id")
+  user_id    String
+  question   String
+  answer     String
+  created_at DateTime @default(now())
+
+  @@map("assistant_conversations")
+}
+
+model Incident {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  visibleId       String   @unique @map("id")
+  trip_id         String
+  summary         String
+  root_cause      String
+  recommendations String[]
+  created_at      DateTime @default(now())
+  created_by_ai   Boolean  @default(false)
+
+  @@map("incidents")
+}
+
+model VehicleHealthSnapshot {
+  id                     String   @id @default(auto()) @map("_id") @db.ObjectId
+  visibleId              String   @unique @map("id")
+  vehicle_id             String
+  health_score           Float
+  predicted_failure_days Int
+  recommendations        String[]
+  calculated_at          DateTime @default(now())
+
+  @@map("vehicle_health_snapshots")
+}

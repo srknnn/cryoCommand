@@ -12,6 +12,8 @@ import { TripsModule } from './trips/trips.module';
 import { ComplianceModule } from './compliance/compliance.module';
 import { ReportsModule } from './reports/reports.module';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { RiskEngineModule } from './risk-engine/risk-engine.module';
+import { AiAssistantModule } from './ai-assistant/ai-assistant.module';
 import { SeedModule } from './seed/seed.module';
 
 @Module({
@@ -40,6 +42,8 @@ import { SeedModule } from './seed/seed.module';
     ComplianceModule,
     ReportsModule,
     DashboardModule,
+    RiskEngineModule,
+    AiAssistantModule,
 
     // Internal modules (dev/test only - protected by EnvironmentGuard)
     SeedModule,
